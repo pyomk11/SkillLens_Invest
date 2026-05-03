@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SkillLens Invest</title>
+    <meta
+      name="description"
+      content="Skills.md 규칙 기반 투자 데이터 자동 분석 대시보드"
+    />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="분석 설정">
+        <div class="brand">
+          <div class="brand-mark">SL</div>
+          <div>
+            <p class="eyebrow">Skills-based</p>
+            <h1>SkillLens Invest</h1>
+          </div>
+        </div>
+
+        <section class="panel compact">
+          <h2>데이터 입력</h2>
+          <label class="field">
+            <span>샘플 시나리오</span>
+            <select id="datasetSelect">
+              <option value="portfolio">멀티에셋 포트폴리오</option>
+              <option value="etf">ETF 섹터 로테이션</option>
+              <option value="single">단일 종목 리스크 진단</option>
+              <option value="korean">비표준 한글 컬럼 CSV</option>
+              <option value="incomplete">불완전 데이터 처리</option>
+            </select>
+          </label>
+          <label class="file-drop" for="csvInput">
+            <span class="file-icon">CSV</span>
+            <strong>CSV 업로드</strong>
+            <small>date, ticker, close 또는 일자, 종목명, 종가 등 자동 감지</small>
+          </label>
+          <input id="csvInput" type="file" accept=".csv,text/csv" />
+        </section>
+
+        <section class="panel compact">
+          <div class="panel-title-row">
+            <h2>Skill 실행 단계</h2>
+            <span id="skillScore" class="score-pill">0%</span>
+          </div>
+          <ol id="skillSteps" class="skill-steps"></ol>
+        </section>
+
+        <section class="panel compact">
+          <h2>감지된 스키마</h2>
+          <div id="schemaList" class="schema-list"></div>
+        </section>
+
+        <section class="panel compact">
+          <h2>대체 계산</h2>
+          <div id="fallbackList" class="fallback-list"></div>
+        </section>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Skill-first Investment Dashboard</p>
+            <h2 id="dashboardTitle">투자 데이터 자동 분석</h2>
+            <p id="dashboardSubtitle" class="subtitle">
+              Skills.md 규칙에 따라 데이터 구조를 감지하고 대시보드를 생성합니다.
+            </p>
+          </div>
+          <div class="toolbar">
+            <button id="downloadSampleBtn" type="button">샘플 CSV</button>
+            <button id="resetBtn" type="button">초기화</button>
+            <button id="exportBtn" type="button" class="primary">분석 요약 복사</button>
+          </div>
+        </header>
+
+        <section class="kpi-grid" id="kpiGrid" aria-label="핵심 투자 지표"></section>
+
+        <section class="analysis-grid">
+          <article class="chart-panel wide">
+            <div class="chart-head">
+              <div>
+                <p class="eyebrow">Performance</p>
+                <h3>누적 성과와 기준선</h3>
+              </div>
+              <span id="dateRange" class="muted"></span>
+            </div>
+            <div class="chart-wrap"><canvas id="equityChart"></canvas></div>
+          </article>
+
+          <article class="chart-panel">
+            <div class="chart-head">
+              <div>
+                <p class="eyebrow">Risk</p>
+                <h3>낙폭 분석</h3>
+              </div>
+            </div>
+            <div class="chart-wrap"><canvas id="drawdownChart"></canvas></div>
+          </article>
+
+          <article class="chart-panel">
+            <div class="chart-head">
+              <div>
+                <p class="eyebrow">Allocation</p>
+                <h3>자산 배분</h3>
+              </div>
+            </div>
+            <div class="chart-wrap"><canvas id="allocationChart"></canvas></div>
+          </article>
+
+          <article class="chart-panel">
+            <div class="chart-head">
+              <div>
+                <p class="eyebrow">Positioning</p>
+                <h3>수익-위험 맵</h3>
+              </div>
+            </div>
+            <div class="chart-wrap"><canvas id="scatterChart"></canvas></div>
+          </article>
+
+          <article class="chart-panel wide">
+            <div class="chart-head">
+              <div>
+                <p class="eyebrow">Correlation</p>
+                <h3>상관 구조</h3>
+              </div>
+              <span id="correlationNote" class="muted"></span>
+            </div>
+            <div id="corrMatrix" class="corr-matrix"></div>
+          </article>
+        </section>
+
+        <section class="bottom-grid">
+          <article class="panel">
+            <div class="panel-title-row">
+              <h2>규칙 기반 인사이트</h2>
+              <span class="muted">숫자 근거 포함</span>
+            </div>
+            <div id="insightList" class="insight-list"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-title-row">
+              <h2>데이터 품질 점검</h2>
+              <span id="qualityBadge" class="score-pill">검사 중</span>
+            </div>
+            <div id="qualityList" class="quality-list"></div>
+          </article>
+        </section>
+
+        <section class="panel table-panel">
+          <div class="panel-title-row">
+            <h2>분석 관측치</h2>
+            <span id="rowCount" class="muted"></span>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead id="tableHead"></thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="./app.js"></script>
+  </body>
+</html>
