@@ -37,13 +37,13 @@ http://localhost:4173
 ```text
 .
 ├── docs/
-│   ├── preview.png
-│   └── proposal.pdf
+│   └── preview.png
 ├── index.html
 ├── styles.css
 ├── app.js
 ├── Skills.md
 ├── SUBMISSION_PLAN.md
+├── 기획서.pdf
 ├── README.md
 └── .gitignore
 ```
